@@ -21,7 +21,7 @@ const Copyright = () => {
 	return (
 		<Typography variant="body2" color="primary" align="center">
 			{"Copyright "}
- 			<Link color="primary" href="#">
+ 			<Link color="primary" href="https://infotechposse.com.br/">
  				{ nomeEmpresa } - v { versionSystem }
  			</Link>{" "}
  			{new Date().getFullYear()}
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 		width: "100vw",
 		height: "100vh",
 		//background: "linear-gradient(to right, #76EE00 , #76EE00 , #458B00)",
-		backgroundImage: "url(https://i.imgur.com/CGby9tN.png)",
+		backgroundImage: "url(https://cdn.discordapp.com/attachments/923949994699030540/1172542696154468422/podio-redondo-de-luz-vermelha-e-fundo-preto-para-simulacao.jpg?ex=661009fb&is=65fd94fb&hm=94618687e8f9ba413e6b3de455503c65b693fd928ef8b2ed19d13624beac78f0&)",
 		backgroundRepeat: "no-repeat",
 		backgroundSize: "100% 100%",
 		backgroundPosition: "center",
