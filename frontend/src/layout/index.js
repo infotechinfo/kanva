@@ -243,7 +243,7 @@ const LoggedInLayout = ({ children, themeToggle }) => {
   //##############################################################################
 
   useEffect(() => {
-    if (document.body.offsetWidth > 1200) {
+    if (document.body.offsetWidth > 600) {
       setDrawerOpen(true);
     }
   }, []);
