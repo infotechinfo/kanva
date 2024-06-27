@@ -115,6 +115,9 @@ export default function Options(props) {
   
   const [SettingsTransfTicket, setSettingsTransfTicket] = useState("disabled");
   const [loadingSettingsTransfTicket, setLoadingSettingsTransfTicket] = useState(false);
+  
+  const [sendGreetingMessageOneQueues, setSendGreetingMessageOneQueues] = useState("disabled");
+  const [loadingSendGreetingMessageOneQueues, setLoadingSendGreetingMessageOneQueues] = useState(false);
 
   const { update } = useSettings();
 
@@ -149,7 +152,12 @@ export default function Options(props) {
       if (SettingsTransfTicket) {
         setSettingsTransfTicket(SettingsTransfTicket.value);
       }
-	  {/*TRANSFERIR TICKET*/}	
+	  {/*TRANSFERIR TICKET*/}
+
+      const sendGreetingMessageOneQueues = settings.find((s) => s.key === "sendGreetingMessageOneQueues");
+      if (sendGreetingMessageOneQueues) {
+        setSendGreetingMessageOneQueues(sendGreetingMessageOneQueues.value)
+      }	  
 	  
       const chatbotType = settings.find((s) => s.key === "chatBotType");
       if (chatbotType) {
@@ -198,6 +206,17 @@ export default function Options(props) {
     });
     toast.success("Operação atualizada com sucesso.");
     setLoadingUserRating(false);
+  }
+  
+    async function handleSendGreetingMessageOneQueues(value) {
+    setSendGreetingMessageOneQueues(value);
+    setLoadingSendGreetingMessageOneQueues(true);
+    await update({
+      key: "sendGreetingMessageOneQueues",
+      value,
+    });
+	toast.success("Operação atualizada com sucesso.");
+    setLoadingSendGreetingMessageOneQueues(false);
   }
 
   async function handleScheduleType(value) {
@@ -498,6 +517,26 @@ export default function Options(props) {
           </FormControl>
         </Grid>
 		
+		{/* ENVIAR SAUDAÇÃO QUANDO HOUVER SOMENTE 1 FILA */}
+        <Grid xs={12} sm={6} md={4} item>
+          <FormControl className={classes.selectContainer}>
+            <InputLabel id="sendGreetingMessageOneQueues-label">Enviar saudação quando houver somente 1 fila</InputLabel>
+            <Select
+              labelId="sendGreetingMessageOneQueues-label"
+              value={sendGreetingMessageOneQueues}
+              onChange={async (e) => {
+                handleSendGreetingMessageOneQueues(e.target.value);
+              }}
+            >
+              <MenuItem value={"disabled"}>Desabilitado</MenuItem>
+              <MenuItem value={"enabled"}>Habilitado</MenuItem>
+            </Select>
+            <FormHelperText>
+              {loadingSendGreetingMessageOneQueues && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
+		
       </Grid>
       <Grid spacing={3} container>
         <Tabs
@@ -517,6 +556,131 @@ export default function Options(props) {
 
         </Tabs>
 
+      </Grid>
+      {/*-----------------IXC-----------------*/}
+      <Grid spacing={3} container
+        style={{ marginBottom: 10 }}>
+        <Tabs
+          indicatorColor="primary"
+          textColor="primary"
+          scrollButtons="on"
+          variant="scrollable"
+          className={classes.tab}
+        >
+          <Tab
+
+            label="IXC" />
+
+        </Tabs>
+        <Grid xs={12} sm={6} md={6} item>
+          <FormControl className={classes.selectContainer}>
+            <TextField
+              id="ipixc"
+              name="ipixc"
+              margin="dense"
+              label="IP do IXC"
+              variant="outlined"
+              value={ipixcType}
+              onChange={async (e) => {
+                handleChangeIPIxc(e.target.value);
+              }}
+            >
+            </TextField>
+            <FormHelperText>
+              {loadingIpIxcType && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
+        <Grid xs={12} sm={6} md={6} item>
+          <FormControl className={classes.selectContainer}>
+            <TextField
+              id="tokenixc"
+              name="tokenixc"
+              margin="dense"
+              label="Token do IXC"
+              variant="outlined"
+              value={tokenixcType}
+              onChange={async (e) => {
+                handleChangeTokenIxc(e.target.value);
+              }}
+            >
+            </TextField>
+            <FormHelperText>
+              {loadingTokenIxcType && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
+      </Grid>
+      {/*-----------------MK-AUTH-----------------*/}
+      <Grid spacing={3} container
+        style={{ marginBottom: 10 }}>
+        <Tabs
+          indicatorColor="primary"
+          textColor="primary"
+          scrollButtons="on"
+          variant="scrollable"
+          className={classes.tab}
+        >
+          <Tab label="MK-AUTH" />
+
+        </Tabs>
+        <Grid xs={12} sm={12} md={4} item>
+          <FormControl className={classes.selectContainer}>
+            <TextField
+              id="ipmkauth"
+              name="ipmkauth"
+              margin="dense"
+              label="Ip Mk-Auth"
+              variant="outlined"
+              value={ipmkauthType}
+              onChange={async (e) => {
+                handleChangeIpMkauth(e.target.value);
+              }}
+            >
+            </TextField>
+            <FormHelperText>
+              {loadingIpMkauthType && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
+        <Grid xs={12} sm={12} md={4} item>
+          <FormControl className={classes.selectContainer}>
+            <TextField
+              id="clientidmkauth"
+              name="clientidmkauth"
+              margin="dense"
+              label="Client Id"
+              variant="outlined"
+              value={clientidmkauthType}
+              onChange={async (e) => {
+                handleChangeClientIdMkauth(e.target.value);
+              }}
+            >
+            </TextField>
+            <FormHelperText>
+              {loadingClientIdMkauthType && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
+        <Grid xs={12} sm={12} md={4} item>
+          <FormControl className={classes.selectContainer}>
+            <TextField
+              id="clientsecretmkauth"
+              name="clientsecretmkauth"
+              margin="dense"
+              label="Client Secret"
+              variant="outlined"
+              value={clientsecretmkauthType}
+              onChange={async (e) => {
+                handleChangeClientSecrectMkauth(e.target.value);
+              }}
+            >
+            </TextField>
+            <FormHelperText>
+              {loadingClientSecrectMkauthType && "Atualizando..."}
+            </FormHelperText>
+          </FormControl>
+        </Grid>
       </Grid>
       {/*-----------------ASAAS-----------------*/}
       <Grid spacing={3} container

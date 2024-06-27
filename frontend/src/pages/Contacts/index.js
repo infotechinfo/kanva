@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useReducer, useContext } from "react";
+import React, { useState, useEffect, useReducer, useContext, useRef } from "react";
 
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
-
+import { Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -20,7 +20,6 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import EditIcon from "@material-ui/icons/Edit";
-
 import api from "../../services/api";
 import TableRowSkeleton from "../../components/TableRowSkeleton";
 import ContactModal from "../../components/ContactModal";
@@ -35,7 +34,7 @@ import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { Can } from "../../components/Can";
 import NewTicketModal from "../../components/NewTicketModal";
-import { socketConnection } from "../../services/socket";
+import { SocketContext } from "../../context/Socket/SocketContext";
 
 import {CSVLink} from "react-csv";
 
@@ -109,6 +108,9 @@ const Contacts = () => {
   const [deletingContact, setDeletingContact] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const fileUploadRef = useRef(null);
+
+  const socketManager = useContext(SocketContext);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -137,7 +139,7 @@ const Contacts = () => {
 
   useEffect(() => {
     const companyId = localStorage.getItem("companyId");
-    const socket = socketConnection({ companyId });
+    const socket = socketManager.getSocket(companyId);
 
     socket.on(`company-${companyId}-contact`, (data) => {
       if (data.action === "update" || data.action === "create") {
@@ -152,7 +154,7 @@ const Contacts = () => {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [ socketManager]);
 
   const handleSearch = (event) => {
     setSearchParam(event.target.value.toLowerCase());
@@ -207,10 +209,20 @@ const Contacts = () => {
     setSearchParam("");
     setPageNumber(1);
   };
-
+  
   const handleimportContact = async () => {
     try {
-      await api.post("/contacts/import");
+      if (!!fileUploadRef.current.files[0]) {
+        const formData = new FormData();
+        formData.append("file", fileUploadRef.current.files[0]);
+        await api.request({
+          url: `/contacts/upload`,
+          method: "POST",
+          data: formData,
+        });
+      } else {
+        await api.post("/contacts/import");
+      }
       history.go(0);
     } catch (err) {
       toastError(err);
@@ -288,6 +300,16 @@ const Contacts = () => {
             {i18n.t("contacts.buttons.import")}
           </Button>
           <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            fileUploadRef.current.value = null;
+            fileUploadRef.current.click();
+          }}
+      >
+        {i18n.t("contacts.buttons.importSheet")}
+      </Button>
+          <Button
             variant="contained"
             color="primary"
             onClick={handleOpenContactModal}
@@ -299,7 +321,7 @@ const Contacts = () => {
           <Button	variant="contained" color="primary"> 
           EXPORTAR CONTATOS 
           </Button>
-          </CSVLink>
+          </CSVLink>		  
 
         </MainHeaderButtonsWrapper>
       </MainHeader>
@@ -308,6 +330,19 @@ const Contacts = () => {
         variant="outlined"
         onScroll={handleScroll}
       >
+        <>
+          <input
+              style={{ display: "none" }}
+              id="upload"
+              name="file"
+              type="file"
+              accept=".xls,.xlsx"
+              onChange={() => {
+                setConfirmOpen(true);
+              }}
+              ref={fileUploadRef}
+          />
+        </>
         <Table size="small">
           <TableHead>
             <TableRow>
